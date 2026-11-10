@@ -1,0 +1,54 @@
+name: Build OwnBot desktop
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Desktop operating system
+        required: true
+        default: windows
+        type: choice
+        options:
+          - windows
+          - macos
+          - linux
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    runs-on: ${{ inputs.platform == 'windows' && 'windows-latest' || inputs.platform == 'macos' && 'macos-latest' || 'ubuntu-24.04' }}
+    timeout-minutes: 60
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: pnpm/action-setup@ff378ebe6b225b0680b81c1ad4498ae0d1d3a5e3
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run src/lib/ownbot-policy.test.ts src/lib/brand.test.ts server/enterprise.test.ts server/brand.test.ts
+      - name: Package Windows
+        if: inputs.platform == 'windows'
+        run: pnpm package:win
+      - name: Package macOS
+        if: inputs.platform == 'macos'
+        run: pnpm package:mac
+      - name: Package Linux
+        if: inputs.platform == 'linux'
+        run: pnpm package:linux
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: OwnBot-${{ inputs.platform }}
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.AppImage
+            release/*.deb

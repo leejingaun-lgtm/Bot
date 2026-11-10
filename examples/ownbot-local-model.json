@@ -1,0 +1,12 @@
+{
+  "instances": {
+    "local-ollama": {
+      "driver": "openai-compat",
+      "displayName": "My local Ollama",
+      "config": {
+        "url": "http://127.0.0.1:11434/v1",
+        "model": "qwen3:8b"
+      }
+    }
+  }
+}

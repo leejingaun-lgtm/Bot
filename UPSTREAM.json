@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/milind-soni/OpenMausBot",
+  "commit": "315361d8aaa4cb177fc48e3b108e3df29dc25552",
+  "license": "Apache-2.0",
+  "excluded": [
+    "enterprise/",
+    ".github/",
+    ".claude/",
+    ".tmpexp/"
+  ]
+}
